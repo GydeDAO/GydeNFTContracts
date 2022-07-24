@@ -2,7 +2,7 @@
 #[cfg(test)]
 use crate::Contract;
 use crate::{TokenMetadata, UserType};
-use near_sdk::json_types::{U128};
+use near_sdk::json_types::U128;
 use near_sdk::test_utils::{accounts, VMContextBuilder};
 use near_sdk::testing_env;
 use near_sdk::{env, AccountId};
@@ -285,4 +285,101 @@ fn test_nft_total_supply() {
 
     let total_supply = contract.nft_total_supply();
     assert_eq!(total_supply, U128(1));
+}
+
+#[test]
+fn test_nft_modify_admin() {
+    let mut context = get_context(accounts(0));
+    testing_env!(context.build());
+    let mut contract = Contract::new_default_meta(accounts(0).into());
+
+    testing_env!(context
+        .storage_usage(env::storage_usage())
+        .attached_deposit(MINT_STORAGE_COST)
+        .predecessor_account_id(accounts(0))
+        .build());
+    let token_id = "0".to_string();
+    contract.nft_mint(
+        token_id.clone(),
+        gyde_token_metadata_sample(Some(String::from("user")), None),
+        accounts(1),
+    );
+    let old_tokens = contract.nft_tokens_for_owner(accounts(1), Some(U128(0)), None);
+    assert_eq!(old_tokens.len(), 1);
+
+    let old_token = old_tokens.get(0).unwrap();
+    assert_eq!(old_token.metadata.user_type.clone().unwrap(), UserType::User.to_string());
+
+    contract.nft_modify_token(
+        token_id.clone(),
+        gyde_token_metadata_sample(Some(String::from("admin")), Some("gyde_test".to_string())),
+    );
+
+    let new_tokens = contract.nft_tokens_for_owner(accounts(1), Some(U128(0)), None);
+    assert_eq!(new_tokens.len(), 1);
+
+    let new_token = new_tokens.get(0).unwrap();
+    assert_eq!(new_token.metadata.user_type.clone().unwrap(), UserType::Admin.to_string());
+                 
+}
+
+#[test]
+#[should_panic(expected = "Only Admin can modify NFTs.")]
+fn test_nft_modify_as_user() {
+    let mut context = get_context(accounts(0));
+    testing_env!(context.build());
+    let mut contract = Contract::new_default_meta(accounts(0).into());
+
+    testing_env!(context
+        .storage_usage(env::storage_usage())
+        .attached_deposit(MINT_STORAGE_COST)
+        .predecessor_account_id(accounts(0))
+        .build());
+    let token_id = "0".to_string();
+    contract.nft_mint(
+        token_id.clone(),
+        gyde_token_metadata_sample(Some(String::from("user")), None),
+        accounts(1),
+    );
+    let old_tokens = contract.nft_tokens_for_owner(accounts(1), Some(U128(0)), None);
+    assert_eq!(old_tokens.len(), 1);
+
+    let old_token = old_tokens.get(0).unwrap();
+    assert_eq!(old_token.metadata.user_type.clone().unwrap(), UserType::User.to_string());
+    testing_env!(context
+        .storage_usage(env::storage_usage())
+        .attached_deposit(MINT_STORAGE_COST)
+        .predecessor_account_id(accounts(1))
+        .build());
+
+    contract.nft_modify_token(
+        token_id.clone(),
+        gyde_token_metadata_sample(Some(String::from("admin")), Some("gyde_test".to_string())),
+    );
+
+    let new_tokens = contract.nft_tokens_for_owner(accounts(1), Some(U128(0)), None);
+    assert_eq!(new_tokens.len(), 1);
+
+    let new_token = new_tokens.get(0).unwrap();
+    assert_eq!(new_token.metadata.user_type.clone().unwrap(), UserType::Admin.to_string());
+}
+
+#[test]
+#[should_panic(expected = "Invalid user type!")]
+pub fn test_nft_mint_invalid_user() {
+    let mut context = get_context(accounts(0));
+    testing_env!(context.build());
+    let mut contract = Contract::new_default_meta(accounts(0).into());
+
+    testing_env!(context
+        .storage_usage(env::storage_usage())
+        .attached_deposit(MINT_STORAGE_COST)
+        .predecessor_account_id(accounts(0))
+        .build());
+    let token_id = "0".to_string();
+    contract.nft_mint(
+        token_id.clone(),
+        gyde_token_metadata_sample(Some(String::from("no_user")), None),
+        accounts(1),
+    );
 }

@@ -27,6 +27,42 @@ near call $NEAR_WALLET new_default_meta '{"owner_id": "'$NEAR_WALLET'"}' --accou
 ```
 
 ## Contract functions
- TBD
  
-## FAQ
+ The main functions of this contract are:
+ * **nft_mint** - allows creating a token with custom metadata
+   * Usage example:
+   ```bash
+    near call <CONTRACT_ID> nft_mint \
+    '{
+        "token_id": <UNIQUE_NFT_ID>
+        "metadata": {
+                "expires_at": serde_json::Value::Null, 
+                "extra": serde_json::Value::Null, 
+                "issued_at": serde_json::Value::Null, 
+                "copies": serde_json::Value::Null,
+                "media_hash": serde_json::Value::Null,
+                "reference": serde_json::Value::Null,
+                "reference_hash": serde_json::Value::Null,
+                "starts_at": serde_json::Value::Null,
+                "updated_at": serde_json::Value::Null,
+                "title": "First NFT",
+                "description": "Cool description",
+                "media": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.Fhp4lHufCdTzTeGCAblOdgHaF7%26pid%3DApi&f=1",
+                "user_type": "Admin", # string, accepts user/super_user/admin
+                "organization": String
+            }
+        "receiver_id": <RECEIVER_ACCOUNT_ID> 
+    }' \
+    --accountId <ADMIN_ACCOUNT_ID>
+    --deposit 1
+   ```
+ * **nft_modify_token** - allows modifying token metadata
+   * structure is the same as above, but receiver ID is not needed.
+   * every field of the NFT metadata can be changed
+
+
+## Constraints and Exceptions
+
+- If NFTs receive user types as metadata, those can be only Admin(admin), Super User(super_user) and User(user). If another is provided, an error is raised.
+- NFT_TRANSFER function works only if the caller has an Admin NFT in his possession. Else, an error is raised and the transaction fails.
+- Contract owner can call any function without having an Admin NFT.
