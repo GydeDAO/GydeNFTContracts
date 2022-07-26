@@ -12,7 +12,7 @@ NFTs are **non-transferable**. Only Admins can transfer them.
 
 ## Installation and Deployment
 
-1. Install Rust.
+1. Install (Rust)[https://www.rust-lang.org/tools/install].
 2. Add `wasm32-unknown-unknown` by running
 ```rust
 rustup target add wasm32-unknown-unknown
@@ -49,7 +49,7 @@ near call $NEAR_WALLET new_default_meta '{"owner_id": "'$NEAR_WALLET'"}' --accou
                 "description": "Cool description",
                 "media": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.Fhp4lHufCdTzTeGCAblOdgHaF7%26pid%3DApi&f=1",
                 "user_type": "Admin", # string, accepts user/super_user/admin
-                "organization": String
+                "organization": String # ex. "Gyde" or "Food Bank"
             }
         "receiver_id": <RECEIVER_ACCOUNT_ID> 
     }' \
@@ -59,7 +59,6 @@ near call $NEAR_WALLET new_default_meta '{"owner_id": "'$NEAR_WALLET'"}' --accou
  * **nft_modify_token** - allows modifying token metadata
    * structure is the same as above, but receiver ID is not needed.
    * every field of the NFT metadata can be changed
-
 
 ## Constraints and Exceptions
 
