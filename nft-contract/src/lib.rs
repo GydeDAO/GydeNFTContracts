@@ -71,7 +71,7 @@ impl Contract {
             owner_id,
             NFTContractMetadata {
                 spec: "nft-1.0.0".to_string(),
-                name: "Gyde Smart Contract".to_string(),
+                name: "Gyde Pass".to_string(),
                 symbol: "GYDE".to_string(),
                 icon: None,
                 base_uri: None,
