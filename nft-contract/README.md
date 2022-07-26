@@ -12,7 +12,7 @@ NFTs are **non-transferable**. Only Admins can transfer them.
 
 ## Installation and Deployment
 
-1. Install (Rust)[https://www.rust-lang.org/tools/install].
+1. Install  Rust - https://www.rust-lang.org/tools/install.
 2. Add `wasm32-unknown-unknown` by running
 ```rust
 rustup target add wasm32-unknown-unknown
